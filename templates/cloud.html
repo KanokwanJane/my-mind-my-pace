@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="cloud-page">
+
+  <audio id="cloudAudio" loop preload="auto">
+    <source src="{{ url_for('static', filename='audio/piano.mp3') }}" type="audio/mpeg">
+  </audio>
+
+  <div class="cloud-topbar">
+    <div>
+      <h1>Cloud Thoughts ☁️</h1>
+      <p>เขียนความคิดวน แล้วปล่อยให้มันลอยผ่านไป เหมือนเมฆบนท้องฟ้า</p>
+    </div>
+
+    <div class="cloud-actions">
+      <button class="cloud-btn" id="cloudMusicBtn">🎵 เปิดเพลง</button>
+      <button class="cloud-btn" onclick="clearClouds()">ล้างท้องฟ้า</button>
+    </div>
+  </div>
+
+  <div class="cloud-input-card">
+    <label>ความคิดที่อยากวางลงตอนนี้</label>
+
+    <div class="cloud-input-row">
+      <input
+        id="thoughtInput"
+        class="cloud-input"
+        placeholder="เช่น ฉันกลัวว่าจะเกิดซ้ำอีก..."
+        autocomplete="off">
+
+      <button class="cloud-send-btn" onclick="releaseThought()">
+        ปล่อยเมฆ
+      </button>
+    </div>
+
+    <small>
+      ความคิดเป็นแค่ความคิด ไม่ใช่ข้อเท็จจริงเสมอไป
+    </small>
+  </div>
+
+  <div id="cloudSky" class="cloud-sky">
+
+    <div class="sun-glow"></div>
+
+    <div id="cloudMessage" class="cloud-message">
+      ลองเขียนสิ่งที่วนอยู่ในหัว แล้วปล่อยให้มันลอยออกไป 🌿
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+const sky = document.getElementById("cloudSky");
+const input = document.getElementById("thoughtInput");
+const message = document.getElementById("cloudMessage");
+
+const cloudAudio = document.getElementById("cloudAudio");
+const cloudMusicBtn = document.getElementById("cloudMusicBtn");
+
+cloudAudio.volume = 0.23;
+
+const comfortLines = [
+  "นี่คือความคิดหนึ่ง ไม่ใช่ข้อเท็จจริงทั้งหมด",
+  "เราไม่จำเป็นต้องเชื่อทุกความคิดที่ผ่านเข้ามา",
+  "ปล่อยให้มันลอยผ่านไป เหมือนเมฆก้อนหนึ่ง",
+  "ตอนนี้ยังไม่ต้องแก้ทุกอย่าง",
+  "เรากลับมาที่ลมหายใจได้เสมอ",
+  "ความคิดมาได้ และผ่านไปได้",
+  "เราไม่ใช่ความคิดของเรา",
+  "ใจที่คิดวน กำลังพยายามปกป้องเรา",
+  "ค่อยๆ วางลงทีละนิดก็พอ",
+  "ตอนนี้เราอยู่ตรงนี้ ไม่ใช่ในความกลัว"
+];
+
+cloudMusicBtn.addEventListener("click", async () => {
+  try {
+    if (cloudAudio.paused) {
+      await cloudAudio.play();
+      cloudMusicBtn.innerHTML = "⏸ ปิดเพลง";
+    } else {
+      cloudAudio.pause();
+      cloudMusicBtn.innerHTML = "🎵 เปิดเพลง";
+    }
+  } catch (err) {
+    console.log("Cloud audio error:", err);
+    cloudMusicBtn.innerHTML = "⚠️ เปิดเพลงไม่ได้";
+  }
+});
+
+function releaseThought() {
+  const text = input.value.trim();
+
+  if (!text) {
+    input.focus();
+    return;
+  }
+
+  createThoughtCloud(text);
+
+  input.value = "";
+
+  const line = comfortLines[Math.floor(Math.random() * comfortLines.length)];
+  message.textContent = line;
+}
+
+function createThoughtCloud(text) {
+  const cloud = document.createElement("div");
+  cloud.className = "thought-cloud";
+
+  const top = Math.random() * 58 + 10;
+  cloud.style.top = top + "%";
+
+  const duration = Math.random() * 12 + 20;
+  cloud.style.animationDuration = duration + "s";
+
+  cloud.innerHTML = `
+    <div class="cloud-shape">
+      <span>${escapeHtml(text)}</span>
+    </div>
+  `;
+
+  sky.appendChild(cloud);
+
+  setTimeout(() => {
+    cloud.remove();
+  }, duration * 1000);
+}
+
+function clearClouds() {
+  document.querySelectorAll(".thought-cloud").forEach(c => c.remove());
+  message.textContent = "ล้างท้องฟ้าแล้ว เริ่มใหม่ได้เสมอ ☁️";
+}
+
+function escapeHtml(str) {
+  return str.replace(/[&<>"']/g, function(match) {
+    return {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#039;"
+    }[match];
+  });
+}
+
+input.addEventListener("keydown", function(e) {
+  if (e.key === "Enter") {
+    releaseThought();
+  }
+});
+</script>
+
+{% endblock %}

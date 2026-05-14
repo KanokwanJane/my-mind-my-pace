@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="sand-page">
+
+  <div class="sand-topbar">
+    <div>
+      <h1>Sand Drawing 🏖️</h1>
+      <p>ลากนิ้วช้าๆ บนพื้นทราย แล้วกลับมาอยู่กับปัจจุบันทีละนิด</p>
+    </div>
+
+    <div class="sand-actions">
+      <button class="sand-btn" onclick="clearSand()">ลบภาพ</button>
+      <button class="sand-btn" onclick="randomPrompt()">ข้อความฮีลใจ</button>
+    </div>
+  </div>
+
+  <div class="sand-card">
+    <canvas id="sandCanvas"></canvas>
+
+    <div id="sandPrompt" class="sand-prompt">
+      ลากเส้นช้าๆ พร้อมหายใจออกยาวๆ 🌿
+    </div>
+  </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("sandCanvas");
+const ctx = canvas.getContext("2d");
+const promptBox = document.getElementById("sandPrompt");
+
+let drawing = false;
+let lastX = 0;
+let lastY = 0;
+
+const comfortLines = [
+  "ตอนนี้ไม่ต้องแก้อะไรทั้งหมดก็ได้",
+  "ลากเส้นช้าๆ แล้วหายใจออกยาวๆ",
+  "ใจที่เหนื่อยควรได้พัก ไม่ใช่ถูกดุ",
+  "แค่ยังอยู่ตรงนี้ก็พอแล้ว",
+  "ความคิดเป็นแค่คลื่น เดี๋ยวมันก็ผ่าน",
+  "ร่างกายกำลังพยายามปกป้องเรา",
+  "วันนี้เราทำดีที่สุดเท่าที่ไหวแล้ว",
+  "ไม่ต้องรีบสงบ แค่ค่อยๆ กลับมาก็พอ",
+  "ตอนนี้เราปลอดภัยพอในนาทีนี้",
+  "เราไม่ต้องเก่งเพื่อสมควรถูกรัก"
+];
+
+function resizeCanvas() {
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+
+  canvas.style.width = rect.width + "px";
+  canvas.style.height = rect.height + "px";
+
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  drawSandBackground();
+}
+
+function drawSandBackground() {
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+
+  const gradient = ctx.createLinearGradient(0, 0, w, h);
+  gradient.addColorStop(0, "#f6e3bd");
+  gradient.addColorStop(0.45, "#edd0a3");
+  gradient.addColorStop(1, "#d8b57e");
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, w, h);
+
+  for (let i = 0; i < 5000; i++) {
+    const x = Math.random() * w;
+    const y = Math.random() * h;
+    const alpha = Math.random() * 0.16;
+
+    ctx.fillStyle = `rgba(120, 85, 45, ${alpha})`;
+    ctx.fillRect(x, y, 1, 1);
+  }
+}
+
+function getPos(e) {
+  const rect = canvas.getBoundingClientRect();
+
+  if (e.touches && e.touches.length > 0) {
+    return {
+      x: e.touches[0].clientX - rect.left,
+      y: e.touches[0].clientY - rect.top
+    };
+  }
+
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
+  };
+}
+
+function startDraw(e) {
+  e.preventDefault();
+  drawing = true;
+
+  const pos = getPos(e);
+  lastX = pos.x;
+  lastY = pos.y;
+}
+
+function draw(e) {
+  if (!drawing) return;
+  e.preventDefault();
+
+  const pos = getPos(e);
+
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.lineWidth = 18;
+
+  ctx.strokeStyle = "rgba(105, 74, 38, 0.34)";
+  ctx.beginPath();
+  ctx.moveTo(lastX, lastY);
+  ctx.lineTo(pos.x, pos.y);
+  ctx.stroke();
+
+  ctx.lineWidth = 7;
+  ctx.strokeStyle = "rgba(255, 244, 214, 0.55)";
+  ctx.beginPath();
+  ctx.moveTo(lastX - 2, lastY - 2);
+  ctx.lineTo(pos.x - 2, pos.y - 2);
+  ctx.stroke();
+
+  lastX = pos.x;
+  lastY = pos.y;
+}
+
+function stopDraw() {
+  drawing = false;
+}
+
+function clearSand() {
+  drawSandBackground();
+  promptBox.innerHTML = "เริ่มใหม่ได้เสมอ เหมือนทรายที่ลบรอยเดิมได้ 🏖️";
+}
+
+function randomPrompt() {
+  const line = comfortLines[Math.floor(Math.random() * comfortLines.length)];
+  promptBox.innerHTML = line;
+}
+
+canvas.addEventListener("mousedown", startDraw);
+canvas.addEventListener("mousemove", draw);
+canvas.addEventListener("mouseup", stopDraw);
+canvas.addEventListener("mouseleave", stopDraw);
+
+canvas.addEventListener("touchstart", startDraw, { passive: false });
+canvas.addEventListener("touchmove", draw, { passive: false });
+canvas.addEventListener("touchend", stopDraw);
+
+window.addEventListener("resize", resizeCanvas);
+
+resizeCanvas();
+</script>
+
+{% endblock %}

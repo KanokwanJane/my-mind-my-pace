@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="bubble-page">
+
+  <audio id="bubbleAudio" loop preload="auto">
+    <source src="{{ url_for('static', filename='audio/piano.mp3') }}" type="audio/mpeg">
+  </audio>
+
+  <div class="bubble-topbar">
+    <div>
+      <h1>Bubble Calm 🫧</h1>
+      <p>แตะฟองเบาๆ แล้วค่อยๆ อยู่กับปัจจุบัน</p>
+    </div>
+
+    <button class="music-btn" id="musicBtn">
+      🎵 เปิดเพลง
+    </button>
+  </div>
+
+  <div id="bubbleContainer" class="bubble-container"></div>
+
+  <div id="comfortText" class="comfort-text">
+    ค่อยๆ หายใจนะ 🌿
+  </div>
+
+</div>
+
+<script>
+
+const comfortLines = {{ comfort_lines | tojson }};
+
+const container = document.getElementById("bubbleContainer");
+const comfortText = document.getElementById("comfortText");
+
+const audio = document.getElementById("bubbleAudio");
+const musicBtn = document.getElementById("musicBtn");
+
+audio.volume = 0.22;
+
+
+/* =========================
+   MUSIC
+========================= */
+
+musicBtn.addEventListener("click", async () => {
+
+  try {
+
+    if (audio.paused) {
+      await audio.play();
+      musicBtn.innerHTML = "⏸ ปิดเพลง";
+    } else {
+      audio.pause();
+      musicBtn.innerHTML = "🎵 เปิดเพลง";
+    }
+
+  } catch (err) {
+    console.log(err);
+  }
+
+});
+
+
+/* =========================
+   CREATE BUBBLE
+========================= */
+
+function createBubble() {
+
+  const bubble = document.createElement("div");
+
+  bubble.classList.add("bubble");
+
+  const size = Math.random() * 80 + 40;
+
+  bubble.style.width = size + "px";
+  bubble.style.height = size + "px";
+
+  bubble.style.left = Math.random() * 90 + "%";
+
+  bubble.style.animationDuration =
+    (Math.random() * 10 + 12) + "s";
+
+  container.appendChild(bubble);
+
+
+  bubble.addEventListener("click", () => {
+
+    bubble.classList.add("pop");
+
+    const randomLine =
+      comfortLines[
+        Math.floor(Math.random() * comfortLines.length)
+      ];
+
+    comfortText.innerHTML = randomLine;
+
+    setTimeout(() => {
+      bubble.remove();
+    }, 300);
+
+  });
+
+
+  setTimeout(() => {
+    bubble.remove();
+  }, 22000);
+
+}
+
+
+/* =========================
+   GENERATE LOOP
+========================= */
+
+setInterval(() => {
+  createBubble();
+}, 900);
+
+
+/* =========================
+   INITIAL
+========================= */
+
+for (let i = 0; i < 8; i++) {
+  createBubble();
+}
+
+</script>
+
+{% endblock %}

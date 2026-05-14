@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">Hope Box 🎁</h1>
+<p class="page-subtitle">เก็บรูป เสียง ข้อความ และสิ่งที่ช่วยพยุงใจ</p>
+
+<div class="card-soft mb-4">
+  <form method="post" enctype="multipart/form-data">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label>ประเภท</label>
+        <select name="type" class="form-select">
+          <option>รูปภาพ</option>
+          <option>เพลง/เสียง</option>
+          <option>Grounding</option>
+          <option>คนที่ไว้ใจ</option>
+          <option>สิ่งที่อยากทำ</option>
+          <option>ข้อความปลอบใจ</option>
+        </select>
+      </div>
+
+      <div class="col-md-8">
+        <label>ชื่อ</label>
+        <input name="title" class="form-control">
+      </div>
+
+      <div class="col-12">
+        <label>รายละเอียด</label>
+        <textarea name="detail" class="form-control" rows="3"></textarea>
+      </div>
+
+      <div class="col-md-6">
+        <label>อัปโหลดรูป</label>
+        <input type="file" name="image" class="form-control">
+      </div>
+
+      <div class="col-md-6">
+        <label>หรือใส่ Link</label>
+        <input name="link" class="form-control">
+      </div>
+
+      <div class="col-12">
+        <button class="btn btn-heal">เพิ่มเข้า Hope Box</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="row g-3">
+  {% for item in items %}
+    <div class="col-md-4">
+      <div class="card-soft h-100">
+        {% if item["รูป/ลิงก์"] and item["รูป/ลิงก์"].startswith("/static") %}
+          <img src="{{ item['รูป/ลิงก์'] }}" class="hope-img mb-3">
+        {% endif %}
+
+        <span class="badge-soft">{{ item["ประเภท"] }}</span>
+        <h5 class="mt-2">{{ item["ชื่อ"] }}</h5>
+        <p class="text-muted">{{ item["รายละเอียด"] }}</p>
+
+        {% if item["รูป/ลิงก์"] %}
+          <a href="{{ item['รูป/ลิงก์'] }}" target="_blank">เปิดรายการ</a>
+        {% endif %}
+      </div>
+    </div>
+  {% else %}
+    <p class="text-muted">ยังไม่มีข้อมูล</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

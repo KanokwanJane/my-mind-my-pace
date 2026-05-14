@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="healing-page">
+
+<audio id="healingAudio" loop preload="auto">
+  <source src="{{ url_for('static', filename='audio/Piano.mp3') }}" type="audio/mpeg">
+</audio>
+
+  <div class="healing-card">
+    <div class="healing-top">
+      <div>
+        <h1>{{ selected.title }} 🌙</h1>
+        <p>{{ selected.subtitle }}</p>
+      </div>
+
+    <button type="button" class="music-btn" id="musicBtn">
+    🎵 เปิดเพลง
+    </button>
+    </div>
+    <div class="theme-picker">
+  <label>เลือกโหมดที่ใจต้องการตอนนี้</label>
+
+  <select class="form-select" onchange="changeHealingTheme(this.value)">
+    {% for key, item in question_sets.items() %}
+      <option value="{{ key }}" {% if key == theme %}selected{% endif %}>
+        {{ item.title }}
+      </option>
+    {% endfor %}
+  </select>
+</div>
+
+    <div class="progress-wrap">
+      <div id="progressBar" class="progress-bar-heal"></div>
+    </div>
+
+    <form method="post" id="healingForm">
+        <input type="hidden" name="theme" value="{{ theme }}">
+
+      {% for q in questions %}
+      <div class="healing-step {% if not loop.first %}d-none{% endif %}" data-step="{{ loop.index0 }}">
+        <div class="question-number">Question {{ loop.index }} / {{ questions|length }}</div>
+
+        <h2>{{ q }}</h2>
+
+        <textarea
+          name="answer{{ loop.index }}"
+          class="healing-textarea"
+          rows="7"
+          placeholder="เขียนเท่าที่อยากเขียนก็พอ..."
+          required></textarea>
+      </div>
+      {% endfor %}
+
+      <div class="healing-actions">
+        <button type="button" class="btn-soft" onclick="prevStep()">ย้อนกลับ</button>
+        <button type="button" class="btn-heal-js" id="nextBtn" onclick="nextStep()">ถัดไป</button>
+        <button type="submit" class="btn-heal-js d-none" id="submitBtn">บันทึกและสรุป</button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+<script>
+let currentStep = 0;
+
+const steps = document.querySelectorAll(".healing-step");
+const nextBtn = document.getElementById("nextBtn");
+const submitBtn = document.getElementById("submitBtn");
+const progressBar = document.getElementById("progressBar");
+
+const audio = document.getElementById("healingAudio");
+const musicBtn = document.getElementById("musicBtn");
+
+audio.volume = 0.25;
+
+
+/* =========================
+   STEP DISPLAY
+========================= */
+
+function showStep(index) {
+
+  steps.forEach((step, i) => {
+    step.classList.toggle("d-none", i !== index);
+  });
+
+  const percent = ((index + 1) / steps.length) * 100;
+  progressBar.style.width = percent + "%";
+
+  if (index === steps.length - 1) {
+    nextBtn.classList.add("d-none");
+    submitBtn.classList.remove("d-none");
+  } else {
+    nextBtn.classList.remove("d-none");
+    submitBtn.classList.add("d-none");
+  }
+
+  // smooth scroll top card
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+}
+
+
+/* =========================
+   NEXT STEP
+========================= */
+
+function nextStep() {
+
+  const textarea = steps[currentStep].querySelector("textarea");
+
+  if (!textarea.value.trim()) {
+    textarea.focus();
+
+    textarea.style.borderColor = "#d87f7f";
+
+    setTimeout(() => {
+      textarea.style.borderColor = "";
+    }, 1000);
+
+    return;
+  }
+
+  if (currentStep < steps.length - 1) {
+    currentStep++;
+    showStep(currentStep);
+  }
+}
+
+
+/* =========================
+   PREV STEP
+========================= */
+
+function prevStep() {
+  if (currentStep > 0) {
+    currentStep--;
+    showStep(currentStep);
+  }
+}
+
+
+/* =========================
+   THEME SWITCH
+========================= */
+
+function changeHealingTheme(theme) {
+  window.location.href = "/healing?theme=" + theme;
+}
+
+
+/* =========================
+   MUSIC CONTROL
+========================= */
+
+musicBtn.addEventListener("click", async () => {
+
+  try {
+
+    if (audio.paused) {
+
+      await audio.play();
+
+      musicBtn.innerHTML = "⏸ ปิดเพลง";
+      musicBtn.classList.add("playing");
+
+    } else {
+
+      audio.pause();
+
+      musicBtn.innerHTML = "🎵 เปิดเพลง";
+      musicBtn.classList.remove("playing");
+    }
+
+  } catch (err) {
+
+    console.log("Audio error:", err);
+
+    musicBtn.innerHTML = "⚠️ เปิดเพลงไม่ได้";
+  }
+});
+
+
+/* =========================
+   AUTO SAVE DRAFT
+========================= */
+
+document.querySelectorAll(".healing-textarea").forEach((textarea, index) => {
+
+  const key = "healing_draft_" + index;
+
+  // load old draft
+  const oldValue = localStorage.getItem(key);
+
+  if (oldValue) {
+    textarea.value = oldValue;
+  }
+
+  // save draft
+  textarea.addEventListener("input", () => {
+    localStorage.setItem(key, textarea.value);
+  });
+
+});
+
+
+/* =========================
+   CLEAR DRAFT AFTER SUBMIT
+========================= */
+
+const healingForm = document.getElementById("healingForm");
+
+if (healingForm) {
+
+  healingForm.addEventListener("submit", () => {
+
+    document.querySelectorAll(".healing-textarea").forEach((textarea, index) => {
+
+      localStorage.removeItem("healing_draft_" + index);
+
+    });
+
+  });
+
+}
+
+
+/* =========================
+   KEYBOARD SHORTCUTS
+========================= */
+
+document.addEventListener("keydown", (e) => {
+
+  // Ctrl + →
+  if (e.ctrlKey && e.key === "ArrowRight") {
+    nextStep();
+  }
+
+  // Ctrl + ←
+  if (e.ctrlKey && e.key === "ArrowLeft") {
+    prevStep();
+  }
+
+});
+
+
+/* =========================
+   INIT
+========================= */
+
+showStep(currentStep);
+
+</script>
+
+{% endblock %}

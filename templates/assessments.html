@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">Assessments 🧾</h1>
+<p class="page-subtitle">แบบประเมิน PCL-T, GAD-7 และ PHQ-9 สำหรับติดตามอาการ</p>
+
+<div class="card-soft mb-4">
+  <h4 class="mb-3">เลือกแบบประเมิน</h4>
+
+  <div class="assessment-tabs mb-4">
+    <button type="button" class="assessment-tab active" onclick="showAssessment('GAD-7', this)">GAD-7</button>
+    <button type="button" class="assessment-tab" onclick="showAssessment('PHQ-9', this)">PHQ-9</button>
+    <button type="button" class="assessment-tab" onclick="showAssessment('PCL-T', this)">PCL-T</button>
+  </div>
+
+  {% for name, qs in questions.items() %}
+  <form method="post" class="assessment-form" id="form-{{ name }}" style="{% if name != 'GAD-7' %}display:none;{% endif %}">
+    <input type="hidden" name="assessment_type" value="{{ name }}">
+
+    <div class="assessment-title">
+      <h4>{{ name }}</h4>
+      <p class="text-muted">
+        {% if name == "PCL-T" %}
+          ให้คะแนน 1–5 ตามระดับความถูกรบกวนในเดือนที่ผ่านมา
+        {% else %}
+          ให้คะแนน 0–3 ตามความถี่ในช่วง 2 สัปดาห์ที่ผ่านมา
+        {% endif %}
+      </p>
+    </div>
+
+    {% for q in qs %}
+    {% set q_no = loop.index %}
+
+    <div class="question-card">
+      <div class="question-text">
+        <b>ข้อ {{ q_no }}.</b> {{ q }}
+      </div>
+
+      <div class="score-options">
+        {% if name == "PCL-T" %}
+          {% for score in range(1, 6) %}
+          <label class="score-pill">
+            <input type="radio" name="q{{ q_no }}" value="{{ score }}" required>
+            <span>{{ score }}</span>
+          </label>
+          {% endfor %}
+        {% else %}
+          {% for score in range(0, 4) %}
+          <label class="score-pill">
+            <input type="radio" name="q{{ q_no }}" value="{{ score }}" required>
+            <span>{{ score }}</span>
+          </label>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    {% endfor %}
+
+    <button class="btn btn-heal mt-3">บันทึกคะแนน {{ name }}</button>
+  </form>
+  {% endfor %}
+</div>
+
+<div class="card-soft">
+  <h4>ประวัติการประเมินล่าสุด</h4>
+
+  {% for item in items %}
+  <div class="list-item">
+    <b>{{ item.get("วันที่เวลา") }}</b><br>
+    <span class="badge-soft">{{ item.get("แบบประเมิน") }}</span>
+    คะแนนรวม <b>{{ item.get("คะแนนรวม") }}</b>
+    <p class="mb-0 text-muted">{{ item.get("แปลผล") }}</p>
+  </div>
+  {% else %}
+  <p class="text-muted">ยังไม่มีผลประเมิน</p>
+  {% endfor %}
+</div>
+
+<script>
+function showAssessment(name, btn) {
+  document.querySelectorAll(".assessment-form").forEach(form => {
+    form.style.display = "none";
+  });
+
+  document.getElementById("form-" + name).style.display = "block";
+
+  document.querySelectorAll(".assessment-tab").forEach(tab => {
+    tab.classList.remove("active");
+  });
+
+  btn.classList.add("active");
+}
+</script>
+
+{% endblock %}

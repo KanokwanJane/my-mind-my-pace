@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <title>Doctor Summary PDF</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    * {
+      font-family: 'Noto Sans Thai', sans-serif;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #f5efe6;
+      color: #2f302c;
+      margin: 0;
+      padding: 24px;
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: auto;
+      background: #fffdf8;
+      padding: 22mm;
+      border-radius: 18px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.08);
+    }
+
+    .top {
+      display: flex;
+      justify-content: space-between;
+      border-bottom: 2px solid #e5d8c8;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .title {
+      font-size: 30px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      color: #777;
+      margin-top: 4px;
+    }
+
+    .badge {
+      background: #eaf3e8;
+      color: #426b50;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 600;
+    }
+
+    .overview {
+      background: linear-gradient(135deg, #eef7ec, #fff3dd);
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 18px;
+      border: 1px solid #eadfce;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    .metric {
+      background: #fff8ed;
+      border: 1px solid #eadfce;
+      border-radius: 16px;
+      padding: 12px;
+      text-align: center;
+    }
+
+    .metric .label {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .metric .value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 4px;
+    }
+
+    h2 {
+      font-size: 18px;
+      margin-top: 24px;
+      border-left: 6px solid #6c9677;
+      padding-left: 10px;
+    }
+
+    .log {
+      border: 1px solid #eadfce;
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+      background: #fffaf2;
+      break-inside: avoid;
+    }
+
+    .date {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .scores {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .score {
+      background: #eef5ea;
+      color: #365b43;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .detail {
+      line-height: 1.75;
+      font-size: 14px;
+    }
+
+    .flashback {
+      border-left: 6px solid #aa99d9;
+    }
+
+    .rumination {
+      border-left: 6px solid #f0bd73;
+    }
+
+    .print-btn {
+      position: fixed;
+      right: 24px;
+      top: 24px;
+      background: #5f8f72;
+      color: white;
+      border: 0;
+      padding: 12px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    @page {
+      size: A4;
+      margin: 12mm;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .page {
+        width: auto;
+        min-height: auto;
+        box-shadow: none;
+        border-radius: 0;
+        padding: 0;
+      }
+
+      .print-btn {
+        display: none;
+      }
+
+      .log, .metric, .overview {
+        break-inside: avoid;
+      }
+    }
+    .assessment-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.assessment-summary-card {
+  background: linear-gradient(135deg, #fffaf2, #fff5ea);
+  border: 1px solid #eadfce;
+  border-radius: 22px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0,0,0,.04);
+}
+
+.assessment-name {
+  font-size: 14px;
+  color: #6f7168;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.assessment-score {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1;
+  color: #2f302c;
+  margin-bottom: 10px;
+}
+
+.assessment-result {
+  display: inline-block;
+  background: #eef5ea;
+  color: #426b50;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.assessment-date {
+  font-size: 11px;
+  color: #8c8d86;
+}
+  </style>
+</head>
+
+<body>
+
+<button class="print-btn" onclick="window.print()">Print / Save PDF</button>
+
+<div class="page">
+
+<div class="top">
+  <div class="report-title-block">
+    <div class="title">Mental Health Summary</div>
+    <div class="subtitle">
+      รายงานสรุปอาการ อารมณ์ Flashback ความคิดวน และวิธีรับมือ 
+    </div>
+  </div>
+
+  <div class="brand-panel compact">
+    <div class="brand">
+      <div class="brand-icon">🌿</div>
+      <div>
+        <b>my mind,my pace</b><br>
+      </div>
+    </div>
+    <div class="brand-footer">Program&Designed by JANE</div>
+  </div>
+</div>
+
+<h2>Assessment Summary</h2>
+
+<div class="assessment-summary-grid">
+  <div class="assessment-summary-card">
+    <div class="assessment-name">GAD-7</div>
+    <div class="assessment-score">{{ summary.gad7.score }}</div>
+    <div class="assessment-result">{{ summary.gad7.result }}</div>
+    <div class="assessment-date">{{ summary.gad7.date }}</div>
+  </div>
+
+  <div class="assessment-summary-card">
+    <div class="assessment-name">PHQ-9</div>
+    <div class="assessment-score">{{ summary.phq9.score }}</div>
+    <div class="assessment-result">{{ summary.phq9.result }}</div>
+    <div class="assessment-date">{{ summary.phq9.date }}</div>
+  </div>
+
+  <div class="assessment-summary-card">
+    <div class="assessment-name">PCL-T</div>
+    <div class="assessment-score">{{ summary.pclt.score }}</div>
+    <div class="assessment-result">{{ summary.pclt.result }}</div>
+    <div class="assessment-date">{{ summary.pclt.date }}</div>
+  </div>
+</div>
+
+  <div class="overview">
+    <b>Clinical Overview</b><br>
+    มีบันทึกอารมณ์ทั้งหมด {{ summary.total_daily }} รายการ,
+    Flashback {{ summary.total_flashback }} ครั้ง,
+    Rumination {{ summary.total_rumination }} รายการ
+  </div>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="label">Avg Mood</div>
+      <div class="value">{{ summary.avg_mood }}</div>
+    </div>
+    <div class="metric">
+      <div class="label">Avg Anxiety</div>
+      <div class="value">{{ summary.avg_anxiety }}</div>
+    </div>
+    <div class="metric">
+      <div class="label">Avg Depress</div>
+      <div class="value">{{ summary.avg_depress }}</div>
+    </div>
+    <div class="metric">
+      <div class="label">Avg Happy</div>
+      <div class="value">{{ summary.avg_happy }}</div>
+    </div>
+    <div class="metric">
+      <div class="label">Avg Irritable</div>
+      <div class="value">{{ summary.avg_irritable }}</div>
+    </div>
+  </div>
+
+  <h2>1. Daily Mood Log</h2>
+
+  {% for item in daily %}
+  <div class="log">
+    <div class="date">{{ item.get("วันที่เวลา") }}</div>
+
+    <div class="scores">
+      <span class="score">Mood {{ item.get("Mood") or "-" }}</span>
+      <span class="score">Anxiety {{ item.get("Anxiety") or "-" }}</span>
+      <span class="score">Depress {{ item.get("Depress") or "-" }}</span>
+      <span class="score">Happy {{ item.get("Happy") or "-" }}</span>
+      <span class="score">Irritable {{ item.get("Irritable") or "-" }}</span>
+    </div>
+
+    <div class="detail">
+      <b>Trigger:</b> {{ item.get("Trigger") or "-" }}<br>
+      <b>Note:</b> {{ item.get("Note") or "-" }}
+    </div>
+  </div>
+  {% endfor %}
+
+  <h2>2. Flashback Details</h2>
+
+  {% for item in flashbacks %}
+  <div class="log flashback">
+    <div class="date">{{ item.get("วันที่เวลา") }}</div>
+    <div class="detail">
+      <b>กิจกรรม:</b> {{ item.get("กิจกรรมที่กำลังทำ") or "-" }}<br>
+      <b>ภาพ/ความทรงจำ:</b> {{ item.get("ภาพ/ความทรงจำที่ผุดขึ้น") or "-" }}<br>
+      <b>Trigger:</b> {{ item.get("Trigger") or "-" }}<br>
+      <b>อาการ:</b> {{ item.get("อาการที่เกิดขึ้น") or "-" }}<br>
+      <b>ความรุนแรง:</b> {{ item.get("ความรุนแรง 0-10") or "-" }}/10<br>
+      <b>วิธี Cope:</b> {{ item.get("วิธี Cope") or "-" }}<br>
+      <b>หลัง Cope:</b> {{ item.get("หลัง Cope เหลือกี่คะแนน") or "-" }}/10
+    </div>
+  </div>
+  {% endfor %}
+
+  <h2>3. Rumination Details</h2>
+
+  {% for item in ruminations %}
+  <div class="log rumination">
+    <div class="date">{{ item.get("วันที่เวลา") }}</div>
+    <div class="detail">
+      <b>Topic:</b> {{ item.get("Topic") or "-" }}<br>
+      <b>ความคิดวน:</b> {{ item.get("ความคิดวน") or "-" }}<br>
+      <b>อารมณ์:</b> {{ item.get("อารมณ์ที่เกิด") or "-" }}<br>
+      <b>คำตอบแบบเมตตาตัวเอง:</b> {{ item.get("คำตอบแบบเมตตาตัวเอง") or "-" }}
+    </div>
+  </div>
+  {% endfor %}
+
+  <h2>4. Assessments</h2>
+
+  {% for item in assessments %}
+  <div class="log">
+    <div class="date">{{ item.get("วันที่เวลา") }}</div>
+    <div class="detail">
+      <b>แบบประเมิน:</b> {{ item.get("แบบประเมิน") or "-" }}<br>
+      <b>คะแนนรวม:</b> {{ item.get("คะแนนรวม") or "-" }}<br>
+      <b>แปลผล:</b> {{ item.get("แปลผล") or "-" }}
+    </div>
+  </div>
+  {% endfor %}
+
+  <h2>5. Coping Notes</h2>
+
+{% for item in coping_notes %}
+<div class="log coping">
+  <div class="date">{{ item.get("วันที่เวลา") }}</div>
+  <div class="detail">
+    <b>หมวด:</b> {{ item.get("หมวด") or "-" }}<br>
+    <b>ชื่อ Note:</b> {{ item.get("ชื่อ Note") or "-" }}<br>
+    <b>ข้อความ:</b> {{ item.get("ข้อความ") or "-" }}
+  </div>
+</div>
+{% else %}
+<div class="log">
+  <div class="detail">ยังไม่มี Coping Notes</div>
+</div>
+{% endfor %}
+
+
+<h2>6. Hope Box</h2>
+
+{% for item in hopebox %}
+<div class="log hopebox">
+  <div class="date">{{ item.get("วันที่เวลา") }}</div>
+  <div class="detail">
+    <b>ประเภท:</b> {{ item.get("ประเภท") or "-" }}<br>
+    <b>ชื่อ:</b> {{ item.get("ชื่อ") or "-" }}<br>
+    <b>รายละเอียด:</b> {{ item.get("รายละเอียด") or "-" }}<br>
+    <b>รูป/ลิงก์:</b> {{ item.get("รูป/ลิงก์") or "-" }}
+  </div>
+
+  {% if item.get("รูป/ลิงก์") and item.get("รูป/ลิงก์").startswith("/static") %}
+    <img src="{{ item.get('รูป/ลิงก์') }}" class="hope-img-pdf">
+  {% endif %}
+</div>
+{% else %}
+<div class="log">
+  <div class="detail">ยังไม่มี Hope Box</div>
+</div>
+{% endfor %}
+
+</div>
+
+</body>
+</html>

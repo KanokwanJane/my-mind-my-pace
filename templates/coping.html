@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">Coping Notes 📝</h1>
+<p class="page-subtitle">ข้อความสั้นๆ ที่อยากให้ตัวเองอ่านตอนรับมือยาก</p>
+
+<div class="card-soft mb-4">
+  <form method="post">
+    <div class="row g-3">
+      <div class="col-md-4">
+        <label>หมวด</label>
+        <select name="category" class="form-select">
+          <option>Flashback</option>
+          <option>Health anxiety</option>
+          <option>Guilt</option>
+          <option>Dissociation</option>
+          <option>Overwhelmed</option>
+          <option>Lonely</option>
+        </select>
+      </div>
+
+      <div class="col-md-8">
+        <label>ชื่อ Note</label>
+        <input name="title" class="form-control">
+      </div>
+
+      <div class="col-12">
+        <label>ข้อความ</label>
+        <textarea name="content" class="form-control" rows="5"></textarea>
+      </div>
+
+      <div class="col-12">
+        <button class="btn btn-heal">บันทึก Coping Note</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="card-soft">
+  <h5>Notes ทั้งหมด</h5>
+
+  {% for item in items %}
+    <div class="list-item">
+      <span class="badge-soft">{{ item["หมวด"] }}</span>
+      <h6 class="mt-2">{{ item["ชื่อ Note"] }}</h6>
+      <p>{{ item["ข้อความ"] }}</p>
+    </div>
+  {% else %}
+    <p class="text-muted">ยังไม่มีข้อมูล</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

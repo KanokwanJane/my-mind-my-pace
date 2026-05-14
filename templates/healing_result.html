@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="healing-result-page">
+  <div class="healing-result-card">
+    <div class="result-icon">🌙</div>
+
+    <h1>ข้อความที่ใจเราฝากไว้</h1>
+    <p class="text-muted">ระบบบันทึกข้อความนี้ไว้ใน Coping Notes และ Healing Log แล้ว</p>
+
+    <div class="summary-note">
+      {{ summary_text.replace('\n', '<br>') | safe }}
+    </div>
+
+    <div class="mt-4 d-flex gap-2 flex-wrap">
+      <a href="/healing" class="btn btn-heal">ทำ Healing Journey อีกครั้ง</a>
+      <a href="/coping" class="btn btn-outline-secondary rounded-pill px-4">ดู Coping Notes</a>
+      <a href="/report" class="btn btn-outline-secondary rounded-pill px-4">ไปหน้า Report</a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

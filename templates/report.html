@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="report-header">
+  <div>
+    <h1 class="page-title">Doctor Summary 🩺</h1>
+    <p class="page-subtitle">สรุปอาการและรายละเอียดทั้งหมดสำหรับนำไปปรึกษาแพทย์</p>
+  </div>
+
+  <div class="report-actions">
+    <a href="/export" class="btn btn-heal">Export Excel</a>
+    <button onclick="window.print()" class="btn btn-outline-secondary rounded-pill px-4">
+      Print / Save PDF
+    </button>
+    <a href="/doctor-pdf" target="_blank" class="btn btn-heal">
+      Open Doctor PDF
+    </a>
+  </div>
+</div>
+
+<div class="summary-box mb-4">
+  <h5>Clinical Overview</h5>
+  <p>
+    ช่วงเวลาที่บันทึกมีทั้งหมด <b>{{ summary.total_daily }}</b> daily logs,
+    flashback <b>{{ summary.total_flashback }}</b> ครั้ง,
+    rumination <b>{{ summary.total_rumination }}</b> รายการ
+  </p>
+</div>
+
+<div class="metric-grid mb-4">
+  <div class="metric-card">
+    <div class="metric-icon">🙂</div>
+    <div>Avg Mood</div>
+    <div class="metric-value">{{ summary.avg_mood }}</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">🫧</div>
+    <div>Avg Anxiety</div>
+    <div class="metric-value">{{ summary.avg_anxiety }}</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">🌧</div>
+    <div>Avg Depress</div>
+    <div class="metric-value">{{ summary.avg_depress }}</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">🔋</div>
+    <div>Avg Happy</div>
+    <div class="metric-value">{{ summary.avg_happy }}</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">😡</div>
+    <div>Avg Irritable</div>
+    <div class="metric-value">{{ summary.avg_irritable }}</div>
+  </div>
+</div>
+
+<div class="card-soft mb-4">
+  <h4>1. Daily Mood Log</h4>
+  <p class="text-muted">รายละเอียดการเช็คอินอารมณ์รายวัน</p>
+
+  {% for item in daily %}
+  <div class="doctor-log-item">
+    <div class="log-date">{{ item.get("วันที่เวลา") }}</div>
+
+    <div class="log-score-row">
+      <span>Mood: <b>{{ item.get("Mood") or "-" }}</b></span>
+      <span>Anxiety: <b>{{ item.get("Anxiety") or "-" }}</b></span>
+      <span>Depress: <b>{{ item.get("Depress") or "-" }}</b></span>
+      <span>Happy: <b>{{ item.get("Happy") or "-" }}</b></span>
+      <span>Irritable: <b>{{ item.get("Irritable") or "-" }}</b></span>
+    </div>
+
+    <div class="log-detail">
+      <b>Trigger:</b> {{ item.get("Trigger") or "-" }}<br>
+      <b>Note:</b> {{ item.get("Note") or "-" }}
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">ยังไม่มี Daily Log</p>
+  {% endfor %}
+</div>
+
+<div class="card-soft mb-4">
+  <h4>2. Flashback Details</h4>
+  <p class="text-muted">รายละเอียด flashback / trigger / อาการทางกาย / วิธี cope</p>
+
+  {% for item in flashbacks %}
+  <div class="doctor-log-item flashback-item">
+    <div class="log-date">{{ item.get("วันที่เวลา") }}</div>
+
+    <div class="log-detail">
+      <b>กิจกรรมที่กำลังทำ:</b> {{ item.get("กิจกรรมที่กำลังทำ") or "-" }}<br>
+      <b>ภาพ/ความทรงจำที่ผุดขึ้น:</b> {{ item.get("ภาพ/ความทรงจำที่ผุดขึ้น") or "-" }}<br>
+      <b>Trigger:</b> {{ item.get("Trigger") or "-" }}<br>
+      <b>อาการที่เกิดขึ้น:</b> {{ item.get("อาการที่เกิดขึ้น") or "-" }}<br>
+      <b>ความรุนแรง:</b> {{ item.get("ความรุนแรง 0-10") or "-" }}/10<br>
+      <b>วิธี Cope:</b> {{ item.get("วิธี Cope") or "-" }}<br>
+      <b>หลัง Cope:</b> {{ item.get("หลัง Cope เหลือกี่คะแนน") or "-" }}/10
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">ยังไม่มี Flashback Log</p>
+  {% endfor %}
+</div>
+
+<div class="card-soft mb-4">
+  <h4>3. Rumination Details</h4>
+  <p class="text-muted">รายละเอียดความคิดวน แยกตาม topic A–E</p>
+
+  {% for item in ruminations %}
+  <div class="doctor-log-item rumination-item">
+    <div class="log-date">{{ item.get("วันที่เวลา") }}</div>
+
+    <div class="log-detail">
+      <b>Topic:</b> {{ item.get("Topic") or "-" }}<br>
+      <b>ความคิดวน:</b> {{ item.get("ความคิดวน") or "-" }}<br>
+      <b>อารมณ์ที่เกิด:</b> {{ item.get("อารมณ์ที่เกิด") or "-" }}<br>
+      <b>คำตอบแบบเมตตาตัวเอง:</b> {{ item.get("คำตอบแบบเมตตาตัวเอง") or "-" }}
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">ยังไม่มี Rumination Log</p>
+  {% endfor %}
+</div>
+
+<div class="card-soft mb-4">
+  <h4>4. Assessments</h4>
+
+  {% for item in assessments %}
+  <div class="doctor-log-item">
+    <div class="log-date">{{ item.get("วันที่เวลา") }}</div>
+    <div class="log-score-row">
+      <span>แบบประเมิน: <b>{{ item.get("แบบประเมิน") }}</b></span>
+      <span>คะแนนรวม: <b>{{ item.get("คะแนนรวม") }}</b></span>
+      <span>แปลผล: <b>{{ item.get("แปลผล") }}</b></span>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">ยังไม่มีผลประเมิน</p>
+  {% endfor %}
+</div>
+
+<div class="card-soft mb-4">
+  <h4>5. Coping Notes</h4>
+
+  {% for item in coping_notes %}
+  <div class="doctor-log-item">
+    <div class="log-date">{{ item.get("วันที่เวลา") }}</div>
+    <div class="log-detail">
+      <b>หมวด:</b> {{ item.get("หมวด") or "-" }}<br>
+      <b>ชื่อ Note:</b> {{ item.get("ชื่อ Note") or "-" }}<br>
+      <b>ข้อความ:</b> {{ item.get("ข้อความ") or "-" }}
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted">ยังไม่มี Coping Notes</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

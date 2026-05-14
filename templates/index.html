@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">Good evening 🌿</h1>
+<p class="page-subtitle">ขอบคุณที่ยังดูแลตัวเองในวันนี้</p>
+
+<div class="card-soft mb-4">
+  <h5 class="mb-3">เช็คอินความรู้สึกตอนนี้</h5>
+
+  <form method="post">
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label>Mood 0-10</label>
+        <input type="number" min="0" max="10" name="mood" class="form-control" required>
+      </div>
+
+      <div class="col-md-3">
+        <label>Anxiety 0-10</label>
+        <input type="number" min="0" max="10" name="anxiety" class="form-control" required>
+      </div>
+
+      <div class="col-md-3">
+        <label>Depress 0-10</label>
+        <input type="number" min="0" max="10" name="depress" class="form-control" required>
+      </div>
+
+      <div class="col-md-3">
+        <label>Happy 0-10</label>
+        <input type="number" min="0" max="10" name="happy" class="form-control">
+      </div>
+
+      <div class="col-md-3">
+        <label>Irritable 0-10</label>
+        <input type="number" min="0" max="10"  name="irritable" class="form-control">
+      </div>
+
+      <div class="col-md-9">
+        <label>Trigger</label>
+        <input name="trigger" class="form-control" placeholder="เช่น อาการทางกาย / สถานที่ / คำพูด / ความทรงจำ">
+      </div>
+
+      <div class="col-12">
+        <label>Note</label>
+        <textarea name="note" class="form-control" rows="3" placeholder="วันนี้อยากบันทึกอะไรไว้บ้าง"></textarea>
+      </div>
+
+      <div class="col-12">
+        <button class="btn btn-heal">บันทึกเลย</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="metric-grid mb-4">
+  <div class="metric-card">
+    <div class="metric-icon">🙂</div>
+    <div>Mood</div>
+    <div class="metric-value">{{ latest["Mood"] if latest else "-" }}</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">🫧</div>
+    <div>Anxiety</div>
+    <div class="metric-value">{{ latest["Anxiety"] if latest else "-" }}</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">🌫</div>
+    <div>Depress</div>
+    <div class="metric-value">{{ latest["Depress"] if latest else "-" }}</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-icon">🔋</div>
+    <div>Happy</div>
+    <div class="metric-value">{{ latest["Happy"] if latest else "-" }}</div>
+  </div>
+
+    <div class="metric-card">
+        <div class="metric-icon">😡</div>
+        <div>Irritable</div>
+        <div class="metric-value">
+            {{ latest.get("Irritable") or "-" if latest else "-" }}
+        </div>
+    </div>
+</div>
+
+<div class="card-soft">
+  <h5>บันทึกล่าสุด</h5>
+
+  {% for item in logs %}
+    <div class="list-item">
+      <b>{{ item["วันที่เวลา"] }}</b><br>
+        Mood {{ item.get("Mood") or "-" }} /
+        Anxiety {{ item.get("Anxiety") or "-" }} /
+        Depress {{ item.get("Depress") or "-" }} /
+        Happy {{ item.get("Happy") or "-" }} /
+        Irritable {{ item.get("Irritable") or "-" }}
+      <p class="mt-2 mb-0 text-muted">{{ item["Note"] }}</p>
+    </div>
+  {% else %}
+    <p class="text-muted">ยังไม่มีข้อมูล</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

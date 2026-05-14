@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="firefly-page">
+
+  <audio id="fireflyAudio" loop preload="auto">
+    <source src="{{ url_for('static', filename='audio/piano.mp3') }}" type="audio/mpeg">
+  </audio>
+
+  <div class="firefly-topbar">
+
+    <div>
+      <h1>Firefly Calm ✨</h1>
+      <p>แตะแสงหิ่งห้อยเบาๆ แล้วค่อยๆ กลับมาอยู่กับตัวเอง</p>
+    </div>
+
+    <div class="firefly-actions">
+
+      <button class="firefly-btn" id="musicBtn">
+        🎵 เปิดเพลง
+      </button>
+
+      <button class="firefly-btn" onclick="spawnMoreFireflies()">
+        ✨ เพิ่มแสง
+      </button>
+
+    </div>
+
+  </div>
+
+  <div id="fireflyField" class="firefly-field"></div>
+
+  <div id="comfortText" class="firefly-message">
+    คืนนี้ค่อยๆ อยู่กับตัวเองนะ 🌙
+  </div>
+
+</div>
+
+<script>
+
+const comfortLines = {{ comfort_lines | tojson }};
+
+const field = document.getElementById("fireflyField");
+const comfortText = document.getElementById("comfortText");
+
+const audio = document.getElementById("fireflyAudio");
+const musicBtn = document.getElementById("musicBtn");
+
+audio.volume = 0.22;
+
+
+/* =========================
+   MUSIC
+========================= */
+
+musicBtn.addEventListener("click", async () => {
+
+  try {
+
+    if (audio.paused) {
+
+      await audio.play();
+
+      musicBtn.innerHTML = "⏸ ปิดเพลง";
+
+    } else {
+
+      audio.pause();
+
+      musicBtn.innerHTML = "🎵 เปิดเพลง";
+
+    }
+
+  } catch (err) {
+
+    console.log(err);
+
+  }
+
+});
+
+
+/* =========================
+   CREATE FIREFLY
+========================= */
+
+function createFirefly() {
+
+  const firefly = document.createElement("div");
+
+  firefly.classList.add("firefly");
+
+  const size = Math.random() * 10 + 8;
+
+  firefly.style.width = size + "px";
+  firefly.style.height = size + "px";
+
+  firefly.style.left =
+    Math.random() * 92 + "%";
+
+  firefly.style.top =
+    Math.random() * 86 + "%";
+
+  firefly.style.animationDuration =
+    (Math.random() * 5 + 6) + "s";
+
+  field.appendChild(firefly);
+
+
+  firefly.addEventListener("click", () => {
+
+    firefly.classList.add("caught");
+
+    const line =
+      comfortLines[
+        Math.floor(Math.random() * comfortLines.length)
+      ];
+
+    comfortText.innerHTML = line;
+
+    setTimeout(() => {
+
+      firefly.remove();
+
+      createFirefly();
+
+    }, 500);
+
+  });
+
+}
+
+
+/* =========================
+   MORE FIREFLIES
+========================= */
+
+function spawnMoreFireflies() {
+
+  for (let i = 0; i < 8; i++) {
+
+    setTimeout(() => {
+
+      createFirefly();
+
+    }, i * 120);
+
+  }
+
+}
+
+
+/* =========================
+   INIT
+========================= */
+
+for (let i = 0; i < 18; i++) {
+  createFirefly();
+}
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">Rumination 💭</h1>
+<p class="page-subtitle">แยกความคิดวนออกจากตัวเรา แล้วตอบตัวเองด้วยความเมตตา</p>
+
+<div class="card-soft mb-4">
+  <form method="post">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label>Topic</label>
+        <select name="topic" class="form-select">
+          <option value="A">A กลัวเหตุการณ์ซ้ำ</option>
+          <option value="B">B โทษตัวเอง</option>
+          <option value="C">C กลัวอนาคตที่ควบคุมไม่ได้</option>
+          <option value="D">D คิดวนเรื่อง ICU/ER/สถานที่จริง</option>
+          <option value="E">E กลัวล้มเหลวในการบำบัด</option>
+        </select>
+      </div>
+
+      <div class="col-md-6">
+        <label>อารมณ์ที่เกิด</label>
+        <input name="emotion" class="form-control" placeholder="กลัว กังวล ผิด เหนื่อย ชา">
+      </div>
+
+      <div class="col-12">
+        <label>ความคิดวน</label>
+        <textarea name="thought" class="form-control" rows="3"></textarea>
+      </div>
+
+      <div class="col-12">
+        <label>คำตอบแบบเมตตาตัวเอง</label>
+        <textarea name="reply" class="form-control" rows="4" placeholder="ถ้าพูดกับตัวเองแบบอ่อนโยน จะบอกว่า..."></textarea>
+      </div>
+
+      <div class="col-12">
+        <button class="btn btn-heal">บันทึกความคิดวน</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="card-soft">
+  <h5>รายการล่าสุด</h5>
+
+  {% for item in items %}
+    <div class="list-item">
+      <span class="badge-soft">Topic {{ item["Topic"] }}</span>
+      <b>{{ item["วันที่เวลา"] }}</b>
+      <p class="mt-2 mb-1">{{ item["ความคิดวน"] }}</p>
+      <small class="text-muted">{{ item["คำตอบแบบเมตตาตัวเอง"] }}</small>
+    </div>
+  {% else %}
+    <p class="text-muted">ยังไม่มีข้อมูล</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

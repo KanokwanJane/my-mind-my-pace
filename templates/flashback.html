@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">Flashback 🌫</h1>
+<p class="page-subtitle">บันทึกอย่างอ่อนโยน ไม่ต้องละเอียดเกินกว่าที่ไหว</p>
+
+<div class="card-soft mb-4">
+  <form method="post">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label>กิจกรรมที่กำลังทำ</label>
+        <input name="activity" class="form-control">
+      </div>
+
+      <div class="col-md-6">
+        <label>Trigger</label>
+        <input name="trigger" class="form-control">
+      </div>
+
+      <div class="col-12">
+        <label>ภาพ/ความทรงจำที่ผุดขึ้น</label>
+        <textarea name="flashback_image" class="form-control" rows="3"></textarea>
+      </div>
+
+      <div class="col-12">
+        <label>อาการที่เกิดขึ้น</label>
+        <input name="symptoms" class="form-control" placeholder="ใจสั่น แน่นหน้าอก ชา เหมือนหลุด">
+      </div>
+
+      <div class="col-md-6">
+        <label>ความรุนแรง 0-10</label>
+        <input type="number" min="0" max="10" name="intensity" class="form-control">
+      </div>
+
+      <div class="col-md-6">
+        <label>หลัง Cope เหลือกี่คะแนน</label>
+        <input type="number" min="0" max="10" name="after_score" class="form-control">
+      </div>
+
+      <div class="col-12">
+        <label>วิธี Cope ที่ใช้</label>
+        <input name="coping" class="form-control" placeholder="หายใจ / grounding / โทรหาใคร / อ่าน coping note">
+      </div>
+
+      <div class="col-12">
+        <button class="btn btn-heal">บันทึก Flashback</button>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="card-soft">
+  <h5>รายการล่าสุด</h5>
+  {% for item in items %}
+    <div class="list-item">
+      <b>{{ item["วันที่เวลา"] }}</b>
+      <span class="badge-soft">ระดับ {{ item["ความรุนแรง 0-10"] }}/10</span>
+      <p class="mb-1 mt-2">{{ item["ภาพ/ความทรงจำที่ผุดขึ้น"] }}</p>
+      <small class="text-muted">Trigger: {{ item["Trigger"] }}</small>
+    </div>
+  {% else %}
+    <p class="text-muted">ยังไม่มีข้อมูล</p>
+  {% endfor %}
+</div>
+
+{% endblock %}
